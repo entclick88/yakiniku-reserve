@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YAKINIKU by ลุงสุรัช — แอดมิน</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14100e; --panel:#201a16; --card:#2a221d; --line:#3a2f28;
+    --gold:#c8a45c; --gold-soft:#e3c988; --red:#b3282d; --red-soft:#d94a3d;
+    --cream:#f3ece1; --muted:#a8998a; --ok:#3f9b5a; --blue:#3a7bd5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--cream);font-family:'Prompt',sans-serif;min-height:100vh;}
+  .hidden{display:none!important;}
+  .muted{color:var(--muted);}
+
+  header{background:linear-gradient(135deg,#241812,#1a120e);border-bottom:1px solid var(--line);
+    padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  header h1{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px;}
+  header .sub{font-size:11px;color:var(--gold);letter-spacing:1px;}
+  .top-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .btn{padding:9px 14px;border:none;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;transition:filter .15s;}
+  .btn:hover{filter:brightness(1.1);} .btn:disabled{opacity:.5;cursor:not-allowed;}
+  .btn-gold{background:linear-gradient(135deg,var(--gold),#a8823f);color:#221812;}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--muted);}
+  .btn-ok{background:var(--ok);color:#fff;} .btn-red{background:var(--red);color:#fff;}
+  .btn-blue{background:var(--blue);color:#fff;} .btn-sm{padding:6px 11px;font-size:12.5px;}
+
+  .container{max-width:1000px;margin:0 auto;padding:20px;}
+  .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px;}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;}
+  .stat .v{font-size:26px;font-weight:700;color:var(--gold-soft);}
+  .stat .l{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  /* calendar */
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .cal-head h2{font-size:18px;font-weight:600;}
+  .cal-nav{display:flex;gap:8px;align-items:center;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .cal-dow{text-align:center;font-size:12px;color:var(--muted);padding:6px 0;}
+  .cal-cell{background:var(--panel);border:1px solid var(--line);border-radius:11px;min-height:78px;padding:7px;cursor:pointer;position:relative;transition:border-color .15s,transform .05s;}
+  .cal-cell:hover{border-color:var(--gold);}
+  .cal-cell.empty{background:transparent;border:none;cursor:default;}
+  .cal-cell.past{opacity:.4;}
+  .cal-cell.today{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset;}
+  .cal-date{font-size:13px;font-weight:600;}
+  .cal-bar{height:6px;border-radius:4px;background:var(--line);margin-top:6px;overflow:hidden;}
+  .cal-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ok),var(--gold));}
+  .cal-bar.full i{background:var(--red);}
+  .cal-info{font-size:11px;margin-top:5px;color:var(--muted);}
+  .cal-info b{color:var(--gold-soft);}
+  .cal-pending{position:absolute;top:6px;right:6px;background:var(--red);color:#fff;font-size:10px;font-weight:700;
+    min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+
+  /* modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(10,7,5,.8);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:16px;max-width:640px;width:100%;margin:24px 0;}
+  .modal-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--panel);border-radius:16px 16px 0 0;}
+  .modal-head h3{font-size:17px;}
+  .modal-body{padding:16px 20px;}
+  .close-x{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;line-height:1;}
+
+  .res-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;}
+  .res-top{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+  .res-top .id{font-size:12px;color:var(--muted);}
+  .res-top .nm{font-weight:600;font-size:15px;}
+  .badge{padding:3px 10px;border-radius:14px;font-size:11.5px;font-weight:600;}
+  .b-รอตรวจสอบ{background:rgba(200,164,92,.18);color:var(--gold-soft);}
+  .b-ยืนยันแล้ว{background:rgba(63,155,90,.2);color:#7fd39a;}
+  .b-ยกเลิก{background:rgba(179,40,45,.2);color:var(--red-soft);}
+  .res-info{font-size:13px;color:var(--muted);line-height:1.7;}
+  .res-info b{color:var(--cream);}
+  .slip-thumb{max-width:90px;max-height:90px;border-radius:8px;border:1px solid var(--line);cursor:pointer;margin-top:8px;}
+  .res-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+
+  label.fld{display:block;font-size:12.5px;color:var(--gold-soft);margin-bottom:6px;}
+  input,textarea,select{width:100%;padding:11px 13px;background:#1a1410;border:1px solid var(--line);border-radius:10px;color:var(--cream);font-family:inherit;font-size:14px;}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);}
+  .field{margin-bottom:14px;}
+
+  /* login */
+  #login{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;}
+  #login .box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:34px 28px;max-width:340px;width:100%;text-align:center;}
+  #login h2{color:var(--gold-soft);margin-bottom:6px;}
+  #login p{font-size:13px;color:var(--muted);margin-bottom:18px;}
+  #loginErr{color:var(--red-soft);font-size:12.5px;margin-top:8px;min-height:16px;}
+
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:11px 22px;border-radius:10px;font-size:14px;z-index:999;display:none;box-shadow:0 6px 20px rgba(0,0,0,.4);}
+  .empty{text-align:center;padding:40px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="box">
+    <h2>🔥 YAKINIKU by ลุงสุรัช</h2>
+    <p>ใส่ Admin Token เพื่อเข้าจัดการการจอง</p>
+    <input type="password" id="tokenInput" placeholder="Admin Token" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn btn-gold" style="width:100%;margin-top:12px;" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <div id="loginErr"></div>
+  </div>
+</div>
+
+<header>
+  <div>
+    <h1>🔥 YAKINIKU by ลุงสุรัช</h1>
+    <div class="sub">ADMIN · ระบบจัดการการจอง</div>
+  </div>
+  <div class="top-actions">
+    <button class="btn btn-ghost btn-sm" onclick="openBroadcast()">📣 ส่งข้อความหาสมาชิก</button>
+    <button class="btn btn-ghost btn-sm" onclick="openSettings()">⚙️ ตั้งค่า</button>
+    <button class="btn btn-ghost btn-sm" onclick="loadMonth()">🔄 รีเฟรช</button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="stat-row" id="statRow"></div>
+
+  <div class="cal-head">
+    <div class="cal-nav">
+      <button class="btn btn-ghost btn-sm" onclick="shiftMonth(-1)">‹</button>
+      <h2 id="calTitle">—</h2>
+      <button class="btn btn-ghost btn-sm" onclick="shiftMonth(1)">›</button>
+    </div>
+    <span class="muted" style="font-size:12px;" id="lastUpdate"></span>
+  </div>
+  <div class="cal-grid" id="calGrid"></div>
+</div>
+
+<!-- DAY MODAL -->
+<div id="dayModal" class="modal-bg hidden" onclick="if(event.target===this)closeModal('dayModal')">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="dayTitle">การจอง</h3>
+      <button class="close-x" onclick="closeModal('dayModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:14px;">
+        <button class="btn btn-blue btn-sm" onclick="broadcastToDay()">📣 แจ้งเฉพาะผู้จองวันนี้</button>
+      </div>
+      <div id="dayList"><div class="empty">กำลังโหลด...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- BROADCAST MODAL -->
+<div id="bcModal" class="modal-bg hidden" onclick="if(event.target===this)closeModal('bcModal')">
+  <div class="modal">
+    <div class="modal-head"><h3>📣 ส่งข้อความหาสมาชิก</h3><button class="close-x" onclick="closeModal('bcModal')">×</button></div>
+    <div class="modal-body">
+      <p class="muted" style="font-size:13px;margin-bottom:14px;">ข้อความจะถูกส่งเข้า LINE ของผู้รับทุกคน (ใช้แจ้งเปลี่ยนแปลง/นัดแนะ)</p>
+      <div class="field">
+        <label class="fld">ส่งถึง</label>
+        <select id="bcTarget">
+          <option value="all">สมาชิกทั้งหมด</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="fld">ข้อความ</label>
+        <textarea id="bcMessage" rows="5" placeholder="พิมพ์ข้อความที่ต้องการแจ้ง..."></textarea>
+      </div>
+      <button class="btn btn-blue" style="width:100%;" id="bcSend" onclick="sendBroadcast()">ส่งข้อความ</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="setModal" class="modal-bg hidden" onclick="if(event.target===this)closeModal('setModal')">
+  <div class="modal">
+    <div class="modal-head"><h3>⚙️ ตั้งค่าระบบ</h3><button class="close-x" onclick="closeModal('setModal')">×</button></div>
+    <div class="modal-body">
+      <div class="field"><label class="fld">จำนวนที่นั่งต่อวัน</label><input type="number" id="setCap"></div>
+      <div class="field"><label class="fld">ราคาปกติ (บาท/ท่าน)</label><input type="number" id="setPrice"></div>
+      <div class="field"><label class="fld">ราคาโปรโมชั่น (บาท/ท่าน)</label><input type="number" id="setPromo"></div>
+      <div class="field"><label class="fld">เปิดโปรโมชั่น?</label>
+        <select id="setPromoOn"><option value="1">เปิด (ใช้ราคาโปร)</option><option value="0">ปิด (ใช้ราคาปกติ)</option></select>
+      </div>
+      <div class="field"><label class="fld">PromptPay (เบอร์/เลขบัตร ปชช. ร้าน)</label><input type="text" id="setPP"></div>
+      <button class="btn btn-gold" style="width:100%;" onclick="saveSettings()">บันทึกการตั้งค่า</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const WORKER_URL = "https://yakiniku-reserve-worker.entclick88.workers.dev";
+
+let token = '';
+let curYear, curMonth; // month 0-11
+let monthData = { capacity:20, days:[] };
+const DOW = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+const MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+
+/* ── login ── */
+window.addEventListener('load', ()=>{
+  const saved = localStorage.getItem('yak_admin_token');
+  if(saved){ document.getElementById('tokenInput').value = saved; doLogin(); }
+});
+async function doLogin(){
+  const t = document.getElementById('tokenInput').value.trim();
+  if(!t) return;
+  try{
+    const r = await fetch(`${WORKER_URL}/api/settings?token=${encodeURIComponent(t)}`);
+    if(r.ok){
+      token=t; localStorage.setItem('yak_admin_token',t);
+      document.getElementById('login').classList.add('hidden');
+      const now=new Date(); curYear=now.getFullYear(); curMonth=now.getMonth();
+      loadMonth();
+    }else{ document.getElementById('loginErr').textContent='Token ไม่ถูกต้อง'; }
+  }catch(e){ document.getElementById('loginErr').textContent='เชื่อมต่อ Worker ไม่ได้ (ตรวจ WORKER_URL)'; }
+}
+
+/* ── calendar ── */
+function shiftMonth(d){
+  curMonth+=d;
+  if(curMonth<0){curMonth=11;curYear--;} if(curMonth>11){curMonth=0;curYear++;}
+  loadMonth();
+}
+function ym(){ return curYear + '-' + String(curMonth+1).padStart(2,'0'); }
+
+async function loadMonth(){
+  document.getElementById('calTitle').textContent = MONTHS[curMonth] + ' ' + (curYear+543);
+  try{
+    const r = await fetch(`${WORKER_URL}/api/reservations/summary?ym=${ym()}&token=${encodeURIComponent(token)}`);
+    monthData = await r.json();
+    renderCalendar(); renderStats();
+    document.getElementById('lastUpdate').textContent = 'อัปเดต ' + new Date().toLocaleTimeString('th-TH');
+  }catch(e){ toast('โหลดข้อมูลไม่ได้'); }
+}
+
+function dayMap(){
+  const m={}; (monthData.days||[]).forEach(d=>m[d.d]={seats:d.seats||0,orders:d.orders||0,pending:d.pending||0}); return m;
+}
+
+function renderStats(){
+  const cap = monthData.capacity||20;
+  const map = dayMap();
+  let totSeats=0, totOrders=0, totPending=0, fullDays=0;
+  Object.values(map).forEach(v=>{ totSeats+=v.seats; totOrders+=v.orders; totPending+=v.pending; if(v.seats>=cap)fullDays++; });
+  document.getElementById('statRow').innerHTML = `
+    <div class="stat"><div class="v">${totOrders}</div><div class="l">การจองเดือนนี้</div></div>
+    <div class="stat"><div class="v">${totSeats}</div><div class="l">ที่นั่งที่จองแล้ว</div></div>
+    <div class="stat"><div class="v" style="color:var(--red-soft)">${totPending}</div><div class="l">รอตรวจสอบสลิป</div></div>
+    <div class="stat"><div class="v">${fullDays}</div><div class="l">วันที่เต็ม</div></div>`;
+}
+
+function renderCalendar(){
+  const cap = monthData.capacity||20;
+  const map = dayMap();
+  const first = new Date(curYear,curMonth,1).getDay();
+  const days = new Date(curYear,curMonth+1,0).getDate();
+  const todayStr = new Date().toISOString().slice(0,10);
+  let html = DOW.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  for(let i=0;i<first;i++) html+=`<div class="cal-cell empty"></div>`;
+  for(let d=1;d<=days;d++){
+    const ds = ym() + '-' + String(d).padStart(2,'0');
+    const info = map[ds] || {seats:0,orders:0,pending:0};
+    const pct = Math.min(100, Math.round(info.seats/cap*100));
+    const full = info.seats>=cap;
+    const isPast = ds < todayStr;
+    const isToday = ds===todayStr;
+    html += `
+      <div class="cal-cell ${isPast?'past':''} ${isToday?'today':''}" onclick="openDay('${ds}')">
+        <div class="cal-date">${d}</div>
+        ${info.pending?`<span class="cal-pending">${info.pending}</span>`:''}
+        <div class="cal-bar ${full?'full':''}"><i style="width:${pct}%"></i></div>
+        <div class="cal-info">${info.seats?`<b>${info.seats}</b>/${cap} ที่`:'<span style="opacity:.5">ว่าง</span>'}</div>
+      </div>`;
+  }
+  document.getElementById('calGrid').innerHTML = html;
+}
+
+/* ── day modal ── */
+let curDay = '';
+async function openDay(ds){
+  curDay = ds;
+  const d = new Date(ds+'T00:00:00');
+  document.getElementById('dayTitle').textContent =
+    'การจอง · ' + d.toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('dayList').innerHTML = '<div class="empty">กำลังโหลด...</div>';
+  document.getElementById('dayModal').classList.remove('hidden');
+  try{
+    const r = await fetch(`${WORKER_URL}/api/reservations?date=${ds}&token=${encodeURIComponent(token)}`);
+    const list = await r.json();
+    renderDayList(list);
+  }catch(e){ document.getElementById('dayList').innerHTML='<div class="empty">โหลดไม่ได้</div>'; }
+}
+
+function renderDayList(list){
+  if(!list.length){ document.getElementById('dayList').innerHTML='<div class="empty">ยังไม่มีการจองในวันนี้ 📭</div>'; return; }
+  document.getElementById('dayList').innerHTML = list.map(o=>{
+    const slip = o.slip_url
+      ? `<a href="${o.slip_url}" target="_blank"><img class="slip-thumb" src="${o.slip_url}" onerror="this.style.display='none'"></a>`
+      : '<div class="muted" style="font-size:12px;margin-top:6px">— ไม่มีสลิป —</div>';
+    const t = new Date(o.timestamp);
+    const actions = o.status==='ยกเลิก' ? '' : `
+      <div class="res-actions">
+        ${o.status!=='ยืนยันแล้ว'?`<button class="btn btn-ok btn-sm" onclick="setStatus(${o.id},'ยืนยันแล้ว')">✅ ยืนยันการจอง</button>`:''}
+        <button class="btn btn-red btn-sm" onclick="setStatus(${o.id},'ยกเลิก')">❌ ยกเลิก</button>
+      </div>`;
+    return `
+      <div class="res-card">
+        <div class="res-top">
+          <span class="id">#${o.id}</span>
+          <span class="nm">${esc(o.name)}</span>
+          <span class="badge b-${o.status}">${o.status}</span>
+        </div>
+        <div class="res-info">
+          🪑 <b>${o.seats} ที่</b> · 💰 <b>${Number(o.amount).toLocaleString()} บาท</b><br>
+          📞 ${esc(o.phone)||'-'}${o.note?`<br>📝 ${esc(o.note)}`:''}
+          <br><span style="font-size:11px">จองเมื่อ ${isNaN(t)?'':t.toLocaleString('th-TH')}</span>
+        </div>
+        ${slip}
+        ${actions}
+      </div>`;
+  }).join('');
+}
+
+async function setStatus(id, status){
+  if(status==='ยกเลิก' && !confirm(`ยืนยันยกเลิกการจอง #${id}? ระบบจะแจ้ง LINE ผู้จอง`)) return;
+  if(status==='ยืนยันแล้ว' && !confirm(`ยืนยันการจอง #${id} และแจ้ง LINE ผู้จอง?`)) return;
+  try{
+    const r = await fetch(`${WORKER_URL}/api/reservations/${id}/status?token=${encodeURIComponent(token)}`,{
+      method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status})
+    });
+    const d = await r.json();
+    if(d.ok){ toast(`อัปเดต #${id} → ${status} + แจ้ง LINE แล้ว`); openDay(curDay); loadMonth(); }
+    else toast('ผิดพลาด: '+(d.error||''));
+  }catch(e){ toast('เชื่อมต่อไม่ได้'); }
+}
+
+/* ── broadcast ── */
+function openBroadcast(){ document.getElementById('bcTarget').value='all'; document.getElementById('bcModal').classList.remove('hidden'); }
+function broadcastToDay(){
+  closeModal('dayModal');
+  const sel = document.getElementById('bcTarget');
+  const label = new Date(curDay+'T00:00:00').toLocaleDateString('th-TH',{day:'numeric',month:'long'});
+  let opt = sel.querySelector(`option[value="${curDay}"]`);
+  if(!opt){ opt=document.createElement('option'); opt.value=curDay; sel.appendChild(opt); }
+  opt.textContent = `เฉพาะผู้จองวันที่ ${label}`;
+  sel.value = curDay;
+  document.getElementById('bcModal').classList.remove('hidden');
+}
+async function sendBroadcast(){
+  const msg = document.getElementById('bcMessage').value.trim();
+  const target = document.getElementById('bcTarget').value;
+  if(!msg){ toast('กรุณาพิมพ์ข้อความ'); return; }
+  if(!confirm('ยืนยันส่งข้อความนี้ไป LINE ผู้รับทุกคน?')) return;
+  const btn = document.getElementById('bcSend'); btn.disabled=true; btn.textContent='กำลังส่ง...';
+  try{
+    const r = await fetch(`${WORKER_URL}/api/broadcast?token=${encodeURIComponent(token)}`,{
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:msg,target})
+    });
+    const d = await r.json();
+    if(d.ok){ toast(`ส่งข้อความสำเร็จ (${d.sent} คน)`); document.getElementById('bcMessage').value=''; closeModal('bcModal'); }
+    else toast('ส่งไม่สำเร็จ: '+(d.error||''));
+  }catch(e){ toast('เชื่อมต่อไม่ได้'); }
+  btn.disabled=false; btn.textContent='ส่งข้อความ';
+}
+
+/* ── settings ── */
+async function openSettings(){
+  try{
+    const r = await fetch(`${WORKER_URL}/api/settings?token=${encodeURIComponent(token)}`);
+    const s = await r.json();
+    document.getElementById('setCap').value = s.capacity_per_day||20;
+    document.getElementById('setPrice').value = s.price||1200;
+    document.getElementById('setPromo').value = s.promo_price||999;
+    document.getElementById('setPromoOn').value = String(s.promo_on)==='1'?'1':'0';
+    document.getElementById('setPP').value = s.promptpay_id||'';
+    document.getElementById('setModal').classList.remove('hidden');
+  }catch(e){ toast('โหลดค่าตั้งค่าไม่ได้'); }
+}
+async function saveSettings(){
+  const body = {
+    capacity_per_day: document.getElementById('setCap').value,
+    price: document.getElementById('setPrice').value,
+    promo_price: document.getElementById('setPromo').value,
+    promo_on: document.getElementById('setPromoOn').value,
+    promptpay_id: document.getElementById('setPP').value,
+  };
+  try{
+    const r = await fetch(`${WORKER_URL}/api/settings?token=${encodeURIComponent(token)}`,{
+      method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
+    });
+    const d = await r.json();
+    if(d.ok){ toast('บันทึกการตั้งค่าแล้ว'); closeModal('setModal'); loadMonth(); }
+    else toast('บันทึกไม่สำเร็จ');
+  }catch(e){ toast('เชื่อมต่อไม่ได้'); }
+}
+
+/* ── utils ── */
+function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; clearTimeout(t._t); t._t=setTimeout(()=>t.style.display='none',3000); }
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+name = "yakiniku-reserve-worker"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+# D1 database — สร้างด้วย:  npx wrangler d1 create yakiniku-reserve
+# แล้วเอา database_id ที่ได้มาใส่แทน REPLACE_WITH_ACTUAL_D1_ID
+[[d1_databases]]
+binding = "DB"
+database_name = "yakiniku-reserve"
+database_id = "363ba748-a0a0-43a1-9fd7-7c4b7caee072"
+
+# Secrets (ตั้งด้วย wrangler secret put ... ไม่ต้องใส่ในไฟล์นี้):
+#   npx wrangler secret put ADMIN_TOKEN   -> รหัสเข้าหน้าแอดมิน
+#   npx wrangler secret put LINE_TOKEN     -> LINE Messaging API channel access token

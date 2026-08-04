@@ -51,6 +51,7 @@
 
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;}
   .chef-card{display:flex;gap:14px;align-items:flex-start;}
+  .chef-card>div{min-width:0;overflow-wrap:anywhere;}
   .chef-badge{
     flex:0 0 62px;height:62px;border-radius:50%;
     background:linear-gradient(135deg,#3a2b1f,#221812);
@@ -64,7 +65,7 @@
   .menu-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px dashed var(--line);}
   .menu-item:last-child{border-bottom:none;}
   .menu-emoji{flex:0 0 46px;height:46px;border-radius:12px;background:#1f1712;display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid var(--line);}
-  .menu-body{flex:1;}
+  .menu-body{flex:1;min-width:0;overflow-wrap:anywhere;}
   .menu-body .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
   .menu-name{font-weight:600;font-size:15px;}
   .menu-jp{font-size:11px;color:var(--gold);font-family:'Noto Serif JP',serif;}
@@ -73,6 +74,7 @@
   /* set banner */
   .set-banner{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#2a1e16,#1f1712);border:1px solid var(--gold);border-radius:14px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:var(--cream);}
   .set-banner b{color:var(--gold-soft);}
+  .set-banner>div:last-child{min-width:0;overflow-wrap:anywhere;}
   .set-badge{flex:0 0 auto;background:var(--red);color:#fff;font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;white-space:nowrap;}
 
   /* à la carte */
@@ -110,7 +112,8 @@
 
   /* ── Member badge ── */
   .member-badge{display:flex;align-items:center;gap:10px;background:#1f1712;border:1px solid var(--gold);border-radius:12px;padding:10px 14px;margin-bottom:16px;}
-  .member-badge img{width:36px;height:36px;border-radius:50%;object-fit:cover;}
+  .member-badge img{width:36px;height:36px;border-radius:50%;object-fit:cover;flex:0 0 auto;}
+  .member-badge>div{min-width:0;overflow-wrap:anywhere;}
   .member-badge .n{font-size:14px;font-weight:600;}
   .member-badge .s{font-size:11px;color:var(--gold);}
 
@@ -342,8 +345,11 @@ let state = {
 window.onload = init;
 async function init(){
   renderMenu();
+  // กันหน้าค้าง: ปิด loading ภายใน 3.5 วิ ไม่ว่า LIFF จะช้า/ล้มเหลว
+  const safety = setTimeout(()=>hide('loadingScreen'), 3500);
   await loadConfig();
   await initLiff();
+  clearTimeout(safety);
   hide('loadingScreen');
   updateCta();
 }
@@ -377,7 +383,13 @@ async function loadConfig(){
 
 async function initLiff(){
   try{
-    await liff.init({ liffId: CONFIG.LIFF_ID });
+    // ยังไม่ตั้ง LIFF_ID จริง → ข้าม (ให้เปิดทดสอบในเบราว์เซอร์ปกติได้ ไม่ค้าง)
+    if(!CONFIG.LIFF_ID || CONFIG.LIFF_ID.startsWith('REPLACE')) throw new Error('LIFF not configured');
+    // กัน liff.init ค้าง: แข่งกับ timeout 3 วิ
+    await Promise.race([
+      liff.init({ liffId: CONFIG.LIFF_ID }),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('LIFF init timeout')), 3000))
+    ]);
     if(!liff.isLoggedIn()){ liff.login(); return; }
     const p = await liff.getProfile();
     state.userId = p.userId;

@@ -36,7 +36,7 @@
   .kanji{font-size:15px;letter-spacing:8px;color:var(--gold);opacity:.85;}
   .hero h1{font-size:30px;font-weight:700;letter-spacing:2px;margin:6px 0 2px;color:#fff;}
   .hero .tag{font-size:13px;color:var(--gold-soft);letter-spacing:1px;}
-  .concept-line{font-size:12px;color:var(--muted);margin-top:6px;}
+  .concept-line{font-size:15.6px;color:var(--gold-soft);margin-top:10px;line-height:1.5;}
   .flame{font-size:34px;display:block;margin-bottom:4px;}
   .exclusive{
     display:inline-block;margin-top:14px;padding:6px 16px;border:1px solid var(--gold);
@@ -60,6 +60,11 @@
   .chef-card h3{font-size:16px;margin-bottom:3px;}
   .chef-card .years{color:var(--gold-soft);font-size:13px;margin-bottom:8px;}
   .chef-card p{font-size:13.5px;color:var(--muted);}
+
+  /* story (เรื่องราวของเรา) */
+  .story-card{text-align:center;padding:24px 20px;}
+  .story-quote{font-family:'Noto Serif JP',serif;font-size:18px;font-style:italic;color:var(--gold-soft);line-height:1.5;margin-bottom:14px;}
+  .story-body{font-size:13.5px;color:var(--muted);line-height:2;}
 
   /* ── Menu ── */
   .menu-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px dashed var(--line);}
@@ -164,22 +169,18 @@
     <span class="flame">🔥</span>
     <div class="kanji serif">焼 肉</div>
     <h1 class="serif">YAKINIKU</h1>
-    <div class="tag">by ลุงสุรัช · เนื้อย่าง 3 สัญชาติ</div>
     <div class="concept-line">บรรยากาศเรียบง่าย · สุนทรีย์ด้วยเสียงดนตรี 🎵</div>
     <div class="exclusive">✦ เปิดจองล่วงหน้าเท่านั้น · รับวันละ <span id="capLabel">20</span> ที่ ✦</div>
   </div>
 
   <!-- ══════════ เชฟ ══════════ -->
   <section>
-    <div class="sec-title"><span class="bar"></span>เรื่องราวของเชฟ <span class="jp">職人</span></div>
-    <div class="card chef-card">
-      <div class="chef-badge">👨‍🍳</div>
-      <div>
-        <h3>เชฟผู้ผ่านไฟจริงจากแดนอาทิตย์อุทัย</h3>
-        <div class="years">ประสบการณ์ทำอาหารที่ประเทศญี่ปุ่นกว่า 40 ปี</div>
-        <p>สี่สิบปีในครัวญี่ปุ่น หล่อหลอมความพิถีพิถันในการคัดเนื้อและจังหวะไฟที่แม่นยำ
-        ถ่ายทอดสู่ <i>เซตเนื้อย่าง 3 สัญชาติ</i> ญี่ปุ่น · อิตาเลียน · ไทย ในแบบเฉพาะตัวของลุงสุรัช</p>
-      </div>
+    <div class="sec-title"><span class="bar"></span>เรื่องราวของเรา <span class="jp">物語</span></div>
+    <div class="card story-card">
+      <div class="story-quote">“ ช้าลงสักนิด… แล้วชีวิตจะมองเห็นเป้าหมาย ”</div>
+      <p class="story-body">มื้ออาหารที่ทรงคุณค่า คือช่วงเวลาแห่งการผ่อนคลาย<br>
+      วางความกระวนกระวายไว้ข้างนอก เหลือไว้เพียงความสงบในใจ<br>
+      ขอให้คุณมีความสุขไปกับบรรยากาศ เสียงเพลง และอาหารในจานตรงหน้า 🎵</p>
     </div>
   </section>
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YAKINIKU by ลุงสุรัช — จองที่นั่ง</title>
+<title>CU' RUK by ลุงสุรัช — จองที่นั่ง</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -169,7 +169,7 @@
   <div class="hero">
     <span class="flame">🔥</span>
     <div class="kanji serif">焼 肉</div>
-    <h1 class="serif">YAKINIKU</h1>
+    <h1 class="serif">CU' RUK</h1>
     <div class="concept-line">บรรยากาศเรียบง่าย · สุนทรีย์ด้วยเสียงดนตรี 🎵</div>
     <div class="exclusive">✦ เปิดจองล่วงหน้าเท่านั้น · รับวันละ <span id="capLabel">20</span> ที่ ✦</div>
   </div>
@@ -433,7 +433,7 @@ function enterMemberMode(){
   const m = state.member;
   document.getElementById('memberBadge').innerHTML =
     `${state.pictureUrl ? `<img src="${state.pictureUrl}">` : '<span style="font-size:28px">🎫</span>'}
-     <div><div class="n">${m.name}</div><div class="s">✦ สมาชิก YAKINIKU by ลุงสุรัช</div></div>`;
+     <div><div class="n">${m.name}</div><div class="s">✦ สมาชิก CU' RUK by ลุงสุรัช</div></div>`;
   // ตั้งวันที่ต่ำสุด = พรุ่งนี้
   const t = new Date(); t.setDate(t.getDate()+1);
   document.getElementById('resDate').min = t.toISOString().slice(0,10);
